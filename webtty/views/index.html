@@ -1,0 +1,21 @@
+<html>
+<head>
+	<title>Terminal</title>
+</head>
+<body>
+	<h1>Terminal</h1>
+	<pre id="terminal">
+	</pre>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script type="text/javascript">
+		var callback = function() {
+			$('#terminal').load('/terminal', function(text, status, xhr) {
+				if (status === 'success') {
+					setTimeout(callback, 100);
+				}
+			})
+		};
+		setTimeout(callback, 50);
+	</script>
+</body>
+</html>

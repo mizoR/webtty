@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -58,29 +59,21 @@ func (app App) Run(option *Option) error {
 
 	// http
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, `
-			<html>
-				<head>
-					<title>Terminal</title>
-				</head>
-				<body>
-				<h1>Terminal</h1>
-				<pre id="terminal">
-				</pre>
-				<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-				<script type="text/javascript">
-					var callback = function() {
-						$('#terminal').load('/terminal', function(text, status, xhr) {
-							if (status === 'success') {
-								setTimeout(callback, 100);
-							}
-						})
-					}
-					setTimeout(callback, 50);
-				</script>
-				</body>
-			</html>
-		`)
+		file, err := os.Open("./webtty/views/index.html")
+		if err != nil {
+			log.Fatal(err)
+		}
+		var buf bytes.Buffer
+		data := make([]byte, 100)
+		for {
+			n, err := file.Read(data)
+			if err == io.EOF {
+				break
+			}
+			buf.Write(data[:n])
+		}
+
+		fmt.Fprintf(w, buf.String())
 	})
 
 	http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
