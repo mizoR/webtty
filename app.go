@@ -8,7 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
+	"text/template"
 	"time"
 
 	"github.com/sugyan/ttyread"
@@ -22,17 +22,6 @@ type App struct {
 func NewApp() *App {
 	app := &App{State: terminal.State{}}
 	return app
-}
-
-func (app App) GetPkgpath() string {
-	gopath := os.Getenv("GOPATH")
-	relpath := filepath.Join(gopath, "src", "github.com", "mizoR", "webtty")
-	pkgpath, err := filepath.Abs(relpath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return pkgpath
 }
 
 func (app App) Run(option *Option) error {
@@ -71,11 +60,11 @@ func (app App) Run(option *Option) error {
 	// http
 	http.HandleFunc(
 		"/",
-		staticViewHandler(filepath.Join(app.GetPkgpath(), "views", "index.html")))
+		staticViewHandler("views/index.html"))
 
 	http.HandleFunc(
 		"/stylesheets/webtty.css",
-		staticViewHandler(filepath.Join(app.GetPkgpath(), "views", "stylesheets", "webtty.css")))
+		staticViewHandler("views/stylesheets/webtty.css"))
 
 	http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
 		var buf bytes.Buffer
@@ -104,22 +93,10 @@ func (app App) Run(option *Option) error {
 
 func staticViewHandler(filepath string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		file, err := os.Open(filepath)
+		t, err := template.ParseFiles(filepath)
 		if err != nil {
 			log.Fatal(err)
 		}
-		var buf bytes.Buffer
-		data := make([]byte, 100)
-		for {
-			n, err := file.Read(data)
-			if err == nil {
-				buf.Write(data[:n])
-			} else if err == io.EOF {
-				break
-			} else {
-				log.Fatal(err)
-			}
-		}
-		fmt.Fprintf(w, buf.String())
+		t.Execute(w, t)
 	}
 }
