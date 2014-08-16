@@ -75,7 +75,22 @@ func (app App) Run(option *Option) error {
 					buf.WriteString("<div class='cursor'></div>")
 				} else {
 					ch, _, _ := app.State.Cell(r, c)
-					buf.WriteRune(ch)
+
+					// HTML escape
+					switch ch {
+					case 34:
+						buf.WriteString("&quot;")
+					case 38:
+						buf.WriteString("&amp;")
+					case 39:
+						buf.WriteString("&#039;")
+					case 60:
+						buf.WriteString("&lt;")
+					case 62:
+						buf.WriteString("&gt;")
+					default:
+						buf.WriteRune(ch)
+					}
 				}
 			}
 			buf.WriteString("\n")
