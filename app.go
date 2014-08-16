@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"text/template"
@@ -30,7 +29,7 @@ func (app App) Run(option *Option) error {
 
 	vt, err := terminal.Create(&(app.State), ioutil.NopCloser(bytes.NewBuffer([]byte{})))
 	if err != nil {
-		return err
+		panic(err)
 	}
 	defer vt.Close()
 
@@ -47,7 +46,7 @@ func (app App) Run(option *Option) error {
 				if err == io.EOF {
 					continue
 				} else {
-					return err
+					panic(err)
 				}
 			}
 			_, err = vt.Write(*data.Buffer)
@@ -100,7 +99,7 @@ func (app App) Run(option *Option) error {
 
 	err = http.ListenAndServe(":10101", nil)
 	if err != nil {
-		return err
+		panic(err)
 	}
 
 	return nil
@@ -110,7 +109,7 @@ func staticViewHandler(filepath string) func(w http.ResponseWriter, r *http.Requ
 	return func(w http.ResponseWriter, r *http.Request) {
 		t, err := template.ParseFiles(filepath)
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
 		t.Execute(w, t)
 	}
