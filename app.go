@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"text/template"
 
 	"j4k.co/terminal"
@@ -57,9 +59,11 @@ func Log(handler http.Handler) http.Handler {
 	})
 }
 
-func staticView(filepath string) func(http.ResponseWriter, *http.Request) {
+func staticView(path string) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		t, err := template.ParseFiles(filepath)
+		// FIXME
+		t, err := template.ParseFiles(
+			filepath.Join(os.Getenv("GOPATH"), "src/github.com/mizoR/webtty", path))
 		if err != nil {
 			panic(err)
 		}
