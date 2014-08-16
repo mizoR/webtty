@@ -67,12 +67,34 @@ func (app App) Run(option *Option) error {
 		data := make([]byte, 100)
 		for {
 			n, err := file.Read(data)
-			if err == io.EOF {
+			if err == nil {
+				buf.Write(data[:n])
+			} else if err == io.EOF {
 				break
+			} else {
+				log.Fatal(err)
 			}
-			buf.Write(data[:n])
 		}
+		fmt.Fprintf(w, buf.String())
+	})
 
+	http.HandleFunc("/stylesheets/webtty.css", func(w http.ResponseWriter, r *http.Request) {
+		file, err := os.Open("./webtty/views/stylesheets/webtty.css")
+		if err != nil {
+			log.Fatal(err)
+		}
+		var buf bytes.Buffer
+		data := make([]byte, 100)
+		for {
+			n, err := file.Read(data)
+			if err == nil {
+				buf.Write(data[:n])
+			} else if err == io.EOF {
+				break
+			} else {
+				log.Fatal(err)
+			}
+		}
 		fmt.Fprintf(w, buf.String())
 	})
 
@@ -83,7 +105,7 @@ func (app App) Run(option *Option) error {
 				ch, _, _ := app.State.Cell(r, c)
 				buf.WriteRune(ch)
 			}
-			buf.WriteString("\n")
+			buf.WriteString("<br>")
 		}
 		fmt.Fprintf(w, "%s", buf.String())
 	})

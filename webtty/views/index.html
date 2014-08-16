@@ -1,11 +1,41 @@
 <html>
 <head>
-	<title>Terminal</title>
+<title>Terminal</title>
+<link rel="stylesheet" href="/stylesheets/webtty.css" type="text/css" />
 </head>
 <body>
-	<h1>Terminal</h1>
-	<pre id="terminal">
-	</pre>
+	<div id="window">
+		<div id="toolbar">
+			<div class="top">
+				<div id="lights">
+					<div class="light red">
+						<div class="glyph">×</div>
+						<div class="shine"></div>
+						<div class="glow"></div>
+					</div>
+					<div class="light yellow">
+						<div class="glyph">-</div>
+						<div class="shine"></div>
+						<div class="glow"></div>
+					</div>
+					<div class="light green">
+						<div class="glyph">+</div>
+						<div class="shine"></div>
+						<div class="glow"></div>
+					</div>
+				</div>
+				<div id="bubble">
+					<div class="shine"></div>
+					<div class="glow"></div>
+				</div>
+			</div>
+		</div>
+		<div id="body">
+			<p id="terminal">
+			</p>
+			<div class="cursor"></div>	
+		</div>	
+	</div>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script type="text/javascript">
 		var callback = function() {

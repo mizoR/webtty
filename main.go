@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	row := flag.Int("row", 100, "rows")
+	row := flag.Int("row", 120, "rows")
 	col := flag.Int("col", 24, "columns")
 	flag.Parse()
 

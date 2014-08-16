@@ -6,6 +6,6 @@ type Option struct {
 }
 
 func NewOption() *Option {
-	option := &Option{Row: 24, Col: 100}
+	option := &Option{Row: 24, Col: 120}
 	return option
 }
