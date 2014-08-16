@@ -70,44 +70,20 @@ func staticView(filepath string) func(http.ResponseWriter, *http.Request) {
 func terminalView(state *terminal.State, row int, col int) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var buf bytes.Buffer
+		writer := NewBufferWriter()
 		cx, cy := state.Cursor()
 
 		for c := 0; c < col; c++ {
 			for r := 0; r < row; r++ {
 				if cx == r && cy == c {
-					writeCursor(&buf)
+					writer.writeCursor(&buf)
 				} else {
 					ch, _, _ := state.Cell(r, c)
-					writeRuneAsSecureHTML(&buf, ch)
+					writer.write(&buf, ch)
 				}
 			}
-			writeLF(&buf)
+			writer.writeLF(&buf)
 		}
 		fmt.Fprint(w, buf.String())
-	}
-}
-
-func writeLF(buf *bytes.Buffer) {
-	buf.WriteRune(10) // LF
-}
-
-func writeCursor(buf *bytes.Buffer) {
-	buf.WriteString("<div class='cursor'></div>")
-}
-
-func writeRuneAsSecureHTML(buf *bytes.Buffer, r rune) {
-	switch r {
-	case 34: // `"`
-		buf.WriteString("&quot;")
-	case 38: // `&`
-		buf.WriteString("&amp;")
-	case 39: // `'`
-		buf.WriteString("&#039;")
-	case 60: // `<`
-		buf.WriteString("&lt;")
-	case 62: // `>`
-		buf.WriteString("&gt;")
-	default:
-		buf.WriteRune(r)
 	}
 }
