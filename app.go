@@ -37,28 +37,14 @@ func (app App) Run(option *Option) error {
 
 	vt.Resize(row, col)
 
-	// Play
 	in, err := os.Open("ttyrecord")
+	if err != nil {
+		panic(err)
+	}
 	reader := ttyread.NewTtyReader(in)
 
-	go func(reader *ttyread.TtyReader) error {
-		for {
-			data, err := reader.ReadData()
-			if err != nil {
-				if err == io.EOF {
-					continue
-				} else {
-					panic(err)
-				}
-			}
-			_, err = vt.Write(*data.Buffer)
-			time.Sleep(100000000)
-		}
+	go play(vt, reader)
 
-		return nil
-	}(reader)
-
-	// http
 	http.HandleFunc(
 		"/",
 		staticView("views/index.html"))
@@ -78,6 +64,21 @@ func (app App) Run(option *Option) error {
 		panic(err)
 	}
 	return nil
+}
+
+func play(vt *terminal.VT, reader *ttyread.TtyReader) {
+	for {
+		data, err := reader.ReadData()
+		if err != nil {
+			if err == io.EOF {
+				continue
+			} else {
+				panic(err)
+			}
+		}
+		_, err = vt.Write(*data.Buffer)
+		time.Sleep(100000000)
+	}
 }
 
 func Log(handler http.Handler) http.Handler {
