@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"text/template"
@@ -24,6 +25,7 @@ func NewApp() *App {
 }
 
 func (app App) Run(option *Option) error {
+	port := 10101
 	row := option.Row
 	col := option.Col
 
@@ -97,12 +99,20 @@ func (app App) Run(option *Option) error {
 		fmt.Fprintf(w, "%s", buf.String())
 	})
 
-	err = http.ListenAndServe(":10101", nil)
+	log.Printf("== The WebTTY is standing on watch at http://0.0.0.0:%d/", port)
+
+	err = http.ListenAndServe(fmt.Sprintf(":%d", port), Log(http.DefaultServeMux))
 	if err != nil {
 		panic(err)
 	}
-
 	return nil
+}
+
+func Log(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("%s %s %s", r.RemoteAddr, r.Method, r.URL)
+		handler.ServeHTTP(w, r)
+	})
 }
 
 func staticViewHandler(filepath string) func(w http.ResponseWriter, r *http.Request) {
