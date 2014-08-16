@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 
-	"./webtty"
+	"github.com/mizoR/webtty/webtty"
 )
 
 func main() {

@@ -59,11 +59,11 @@ func (app App) Run(option *Option) error {
 	// http
 	http.HandleFunc(
 		"/",
-		staticViewHandler("./webtty/views/index.html"))
+		staticViewHandler("./views/index.html"))
 
 	http.HandleFunc(
 		"/stylesheets/webtty.css",
-		staticViewHandler("./webtty/views/stylesheets/webtty.css"))
+		staticViewHandler("./views/stylesheets/webtty.css"))
 
 	http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
 		var buf bytes.Buffer
