@@ -34,7 +34,6 @@ func (app App) Run(option *Option) error {
 	defer vt.Close()
 
 	vt.Resize(row, col)
-	vt.Write([]byte("ls\n"))
 
 	// Play
 	in, err := os.Open("ttyrecord")
