@@ -57,45 +57,13 @@ func (app App) Run(option *Option) error {
 	}()
 
 	// http
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		file, err := os.Open("./webtty/views/index.html")
-		if err != nil {
-			log.Fatal(err)
-		}
-		var buf bytes.Buffer
-		data := make([]byte, 100)
-		for {
-			n, err := file.Read(data)
-			if err == nil {
-				buf.Write(data[:n])
-			} else if err == io.EOF {
-				break
-			} else {
-				log.Fatal(err)
-			}
-		}
-		fmt.Fprintf(w, buf.String())
-	})
+	http.HandleFunc(
+		"/",
+		staticViewHandler("./webtty/views/index.html"))
 
-	http.HandleFunc("/stylesheets/webtty.css", func(w http.ResponseWriter, r *http.Request) {
-		file, err := os.Open("./webtty/views/stylesheets/webtty.css")
-		if err != nil {
-			log.Fatal(err)
-		}
-		var buf bytes.Buffer
-		data := make([]byte, 100)
-		for {
-			n, err := file.Read(data)
-			if err == nil {
-				buf.Write(data[:n])
-			} else if err == io.EOF {
-				break
-			} else {
-				log.Fatal(err)
-			}
-		}
-		fmt.Fprintf(w, buf.String())
-	})
+	http.HandleFunc(
+		"/stylesheets/webtty.css",
+		staticViewHandler("./webtty/views/stylesheets/webtty.css"))
 
 	http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
 		var buf bytes.Buffer
@@ -120,4 +88,26 @@ func (app App) Run(option *Option) error {
 	}
 
 	return nil
+}
+
+func staticViewHandler(filepath string) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		file, err := os.Open(filepath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		var buf bytes.Buffer
+		data := make([]byte, 100)
+		for {
+			n, err := file.Read(data)
+			if err == nil {
+				buf.Write(data[:n])
+			} else if err == io.EOF {
+				break
+			} else {
+				log.Fatal(err)
+			}
+		}
+		fmt.Fprintf(w, buf.String())
+	}
 }
