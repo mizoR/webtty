@@ -3,15 +3,10 @@ package webtty
 import (
 	"bytes"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"text/template"
-	"time"
 
-	"github.com/sugyan/ttyread"
 	"j4k.co/terminal"
 )
 
@@ -25,25 +20,14 @@ func NewApp() *App {
 }
 
 func (app App) Run(option *Option) error {
+	inFile := "ttyrecord"
 	port := 10101
 	row := option.Row
 	col := option.Col
+	state := &app.State
 
-	vt, err := terminal.Create(&(app.State), ioutil.NopCloser(bytes.NewBuffer([]byte{})))
-	if err != nil {
-		panic(err)
-	}
-	defer vt.Close()
-
-	vt.Resize(row, col)
-
-	in, err := os.Open("ttyrecord")
-	if err != nil {
-		panic(err)
-	}
-	reader := ttyread.NewTtyReader(in)
-
-	go play(vt, reader)
+	player := NewPlayer(state, row, col)
+	player.Play(inFile)
 
 	http.HandleFunc(
 		"/",
@@ -55,30 +39,15 @@ func (app App) Run(option *Option) error {
 
 	http.HandleFunc(
 		"/terminal",
-		terminalView(&(app.State), row, col))
+		terminalView(state, row, col))
 
 	log.Printf("== The WebTTY is standing on watch at http://0.0.0.0:%d/", port)
 
-	err = http.ListenAndServe(fmt.Sprintf(":%d", port), Log(http.DefaultServeMux))
+	err := http.ListenAndServe(fmt.Sprintf(":%d", port), Log(http.DefaultServeMux))
 	if err != nil {
 		panic(err)
 	}
 	return nil
-}
-
-func play(vt *terminal.VT, reader *ttyread.TtyReader) {
-	for {
-		data, err := reader.ReadData()
-		if err != nil {
-			if err == io.EOF {
-				continue
-			} else {
-				panic(err)
-			}
-		}
-		_, err = vt.Write(*data.Buffer)
-		time.Sleep(100000000)
-	}
 }
 
 func Log(handler http.Handler) http.Handler {
