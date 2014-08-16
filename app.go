@@ -41,7 +41,7 @@ func (app App) Run(option *Option) error {
 	in, err := os.Open("ttyrecord")
 	reader := ttyread.NewTtyReader(in)
 
-	go func() error {
+	go func(reader *ttyread.TtyReader) error {
 		for {
 			data, err := reader.ReadData()
 			if err != nil {
@@ -56,7 +56,7 @@ func (app App) Run(option *Option) error {
 		}
 
 		return nil
-	}()
+	}(reader)
 
 	// http
 	http.HandleFunc(
