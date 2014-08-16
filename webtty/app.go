@@ -100,12 +100,17 @@ func (app App) Run(option *Option) error {
 
 	http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
 		var buf bytes.Buffer
+		cx, cy := app.State.Cursor()
 		for c := 0; c < col; c++ {
 			for r := 0; r < row; r++ {
-				ch, _, _ := app.State.Cell(r, c)
-				buf.WriteRune(ch)
+				if cx == r && cy == c {
+					buf.WriteString("<div class='cursor'></div>")
+				} else {
+					ch, _, _ := app.State.Cell(r, c)
+					buf.WriteRune(ch)
+				}
 			}
-			buf.WriteString("<br>")
+			buf.WriteString("\n")
 		}
 		fmt.Fprintf(w, "%s", buf.String())
 	})
