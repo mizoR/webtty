@@ -1,11 +1,13 @@
 package webtty
 
 type Option struct {
-	Row int
-	Col int
+	InFile string
+	Port   int
+	Row    int
+	Col    int
 }
 
 func NewOption() *Option {
-	option := &Option{Row: 24, Col: 120}
+	option := &Option{InFile: "ttyrecord", Port: 10101, Row: 24, Col: 120}
 	return option
 }

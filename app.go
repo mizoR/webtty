@@ -20,8 +20,8 @@ func NewApp() *App {
 }
 
 func (app App) Run(option *Option) error {
-	inFile := "ttyrecord"
-	port := 10101
+	inFile := option.InFile
+	port := option.Port
 	row := option.Row
 	col := option.Col
 	state := &app.State
