@@ -96,7 +96,7 @@ func (app App) Run(option *Option) error {
 			}
 			buf.WriteString("\n")
 		}
-		fmt.Fprintf(w, "%s", buf.String())
+		fmt.Fprint(w, buf.String())
 	})
 
 	log.Printf("== The WebTTY is standing on watch at http://0.0.0.0:%d/", port)
