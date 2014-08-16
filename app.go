@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/sugyan/ttyread"
@@ -21,6 +22,17 @@ type App struct {
 func NewApp() *App {
 	app := &App{State: terminal.State{}}
 	return app
+}
+
+func (app App) GetPkgpath() string {
+	gopath := os.Getenv("GOPATH")
+	relpath := filepath.Join(gopath, "src", "github.com", "mizoR", "webtty")
+	pkgpath, err := filepath.Abs(relpath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return pkgpath
 }
 
 func (app App) Run(option *Option) error {
@@ -59,11 +71,11 @@ func (app App) Run(option *Option) error {
 	// http
 	http.HandleFunc(
 		"/",
-		staticViewHandler("./views/index.html"))
+		staticViewHandler(filepath.Join(app.GetPkgpath(), "views", "index.html")))
 
 	http.HandleFunc(
 		"/stylesheets/webtty.css",
-		staticViewHandler("./views/stylesheets/webtty.css"))
+		staticViewHandler(filepath.Join(app.GetPkgpath(), "views", "stylesheets", "webtty.css")))
 
 	http.HandleFunc("/terminal", func(w http.ResponseWriter, r *http.Request) {
 		var buf bytes.Buffer
